@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant LaunchActivityItem
+participant ActivityClientRecord
+participant ActivityThread
+participant Instrumentation
+participant Activity
+
+[-> LaunchActivityItem: execute
+activate LaunchActivityItem
+    LaunchActivityItem -> ActivityClientRecord: new
+    activate ActivityClientRecord
+    deactivate ActivityClientRecord
+    LaunchActivityItem -> ActivityThread: handleLaunchActivity(ActivityClientRecord, ...)
+deactivate LaunchActivityItem
+activate ActivityThread
+ActivityThread -> ActivityThread: performLaunchActivity(ActivityClientRecord, Intent)
+    activate ActivityThread
+    ActivityThread -> Instrumentation: newActivity
+    activate Instrumentation
+    Instrumentation --> ActivityThread: Activity
+    deactivate Instrumentation
+    ActivityThread -> Activity: attach(...,NonConfigurationInstances,...)
+@enduml

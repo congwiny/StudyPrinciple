@@ -1,0 +1,61 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant ActivityRelaunchItem
+participant ActivityThread
+participant Instrumentation
+participant ComponentActivity
+participant ActivityClientRecord
+
+[-> ActivityRelaunchItem: execute
+activate ActivityRelaunchItem
+ActivityRelaunchItem -> ActivityThread: handleRelaunchActivity(ActivityClientRecord, ...)
+activate ActivityThread
+ActivityThread -> ActivityThread: handleRelaunchActivityInner(ActivityClientRecord, ...)
+activate ActivityThread
+ActivityThread -> ActivityThread: handleDestroyActivity(ActivityClientRecord r,...)
+activate ActivityThread
+ActivityThread -> ActivityThread: performDestroyActivity((ActivityClientRecord r, boolean getNonConfigInstance)
+activate ActivityThread
+ActivityThread -> ComponentActivity: retainNonConfigurationInstances()
+activate ComponentActivity
+ComponentActivity -> ComponentActivity: onRetainNonConfigurationInstance()
+ComponentActivity --> ActivityThread: NonConfigurationInstances
+deactivate ComponentActivity
+
+ActivityThread -> ActivityClientRecord: set lastNonConfigurationInstances
+deactivate ActivityThread
+deactivate ActivityThread
+
+ActivityThread -> ActivityThread: handleLaunchActivity(ActivityClientRecord, ...)
+activate ActivityThread
+ActivityThread -> ActivityThread: performLaunchActivity(ActivityClientRecord, ...)
+activate ActivityThread
+ActivityThread -> Instrumentation: newActivity(ClassLoader cl, String className, Intent intent)
+activate Instrumentation
+Instrumentation --> ActivityThread: Activity
+deactivate Instrumentation
+ActivityThread -> ComponentActivity: attach(..., NonConfigurationInstances lastNonConfigurationInstances,...)
+activate ComponentActivity
+ComponentActivity -> ComponentActivity: set mLastNonConfigurationInstances
+activate ComponentActivity
+deactivate ComponentActivity
+deactivate ComponentActivity
+
+ActivityThread -> ActivityClientRecord: set lastNonConfigurationInstances = null
+
+ActivityThread -> Instrumentation: callActivityOnCreate
+activate Instrumentation
+Instrumentation -> ComponentActivity: performCreate
+deactivate Instrumentation
+activate ComponentActivity
+ComponentActivity -> ComponentActivity: onCreate()
+activate ComponentActivity
+note right of ComponentActivity
+后续查看 ViewModelStoreSeq.puml
+end note
+
+
+@enduml

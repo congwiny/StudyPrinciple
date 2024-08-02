@@ -1,0 +1,51 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+participant ActivityThread
+participant Instrumentation
+participant ComponentActivity
+participant ContextAwareHelper
+participant FragmentController
+participant FragmentManager
+participant FragmentActivity.HostCallbacks as HostCallbacks
+participant ViewModelStore
+
+[-> ActivityThread: handleLaunchActivity
+activate ActivityThread
+ActivityThread -> ActivityThread: performLaunchActivity(ActivityClientRecord, Intent)
+    activate ActivityThread
+    ActivityThread -> Instrumentation: callActivityOnCreate
+    activate Instrumentation
+    Instrumentation -> ComponentActivity: performCreate
+    activate ComponentActivity
+    ComponentActivity -> ComponentActivity: onCreate
+    activate ComponentActivity
+    ComponentActivity -> ContextAwareHelper: dispatchOnContextAvailable
+    activate ContextAwareHelper
+    ContextAwareHelper -> FragmentController: attachHost
+    activate FragmentController
+    FragmentController -> FragmentManager: attachController
+    activate FragmentManager
+    FragmentManager -> HostCallbacks: getViewModelStore
+    activate HostCallbacks
+    HostCallbacks -> ComponentActivity: ensureViewModelStore
+    deactivate HostCallbacks
+    activate ComponentActivity
+    note right of ComponentActivity #aqua
+    private fun ensureViewModelStore() {
+            if (_viewModelStore == null) {
+                val nc = lastNonConfigurationInstance as NonConfigurationInstances?
+                if (nc != null) {
+                    // Restore the ViewModelStore from NonConfigurationInstances
+                    _viewModelStore = nc.viewModelStore
+                }
+                if (_viewModelStore == null) {
+                    _viewModelStore = ViewModelStore()
+                }
+            }
+        }
+    end note
+
+@enduml
