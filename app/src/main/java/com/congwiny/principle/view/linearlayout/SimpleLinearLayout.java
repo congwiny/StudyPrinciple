@@ -10,7 +10,7 @@ import com.congwiny.principle.R;
 
 public class SimpleLinearLayout extends ViewGroup {
     public static final int HORIZONTAL = 0;
-    public static final int VERTICAL = 1;
+    public static final int VERTICAL   = 1;
 
     private int mOrientation = HORIZONTAL; // 默认水平布局
 
@@ -36,20 +36,15 @@ public class SimpleLinearLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-
-        int paddingLeft = getPaddingLeft();
-        int paddingRight = getPaddingRight();
-        int paddingTop = getPaddingTop();
+        int paddingLeft   = getPaddingLeft();
+        int paddingRight  = getPaddingRight();
+        int paddingTop    = getPaddingTop();
         int paddingBottom = getPaddingBottom();
 
         int count = getChildCount();
-        int totalWidth = paddingLeft + paddingRight;
+        int totalWidth  = paddingLeft + paddingRight;
         int totalHeight = paddingTop + paddingBottom;
-        int maxChildWidth = 0;
+        int maxChildWidth  = 0;
         int maxChildHeight = 0;
 
         for (int i = 0; i < count; i++) {
@@ -57,8 +52,7 @@ public class SimpleLinearLayout extends ViewGroup {
             if (child.getVisibility() == GONE) continue;
 
             MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-
-            int childWidthSpec = getChildMeasureSpec(
+            int childWidthSpec  = getChildMeasureSpec(
                     widthMeasureSpec,
                     paddingLeft + paddingRight + lp.leftMargin + lp.rightMargin,
                     lp.width);
@@ -69,11 +63,11 @@ public class SimpleLinearLayout extends ViewGroup {
 
             child.measure(childWidthSpec, childHeightSpec);
 
-            int measuredW = child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
-            int measuredH = child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
+            int measuredW = child.getMeasuredWidth()  + lp.leftMargin + lp.rightMargin;
+            int measuredH = child.getMeasuredHeight() + lp.topMargin  + lp.bottomMargin;
 
             if (mOrientation == HORIZONTAL) {
-                totalWidth += measuredW;
+                totalWidth  += measuredW;
                 maxChildHeight = Math.max(maxChildHeight, measuredH);
             } else {
                 totalHeight += measuredH;
@@ -84,32 +78,20 @@ public class SimpleLinearLayout extends ViewGroup {
         int finalWidth;
         int finalHeight;
         if (mOrientation == HORIZONTAL) {
-            finalWidth = resolveDimension(totalWidth, widthSize, widthMode);
-            finalHeight = resolveDimension(maxChildHeight + paddingTop + paddingBottom, heightSize, heightMode);
+            finalWidth  = resolveSize(totalWidth, widthMeasureSpec);
+            finalHeight = resolveSize(maxChildHeight + paddingTop + paddingBottom, heightMeasureSpec);
         } else {
-            finalWidth = resolveDimension(maxChildWidth + paddingLeft + paddingRight, widthSize, widthMode);
-            finalHeight = resolveDimension(totalHeight, heightSize, heightMode);
+            finalWidth  = resolveSize(maxChildWidth  + paddingLeft + paddingRight, widthMeasureSpec);
+            finalHeight = resolveSize(totalHeight,                heightMeasureSpec);
         }
 
         setMeasuredDimension(finalWidth, finalHeight);
     }
 
-    private int resolveDimension(int desired, int size, int mode) {
-        switch (mode) {
-            case MeasureSpec.EXACTLY:
-                return size;
-            case MeasureSpec.AT_MOST:
-                return Math.min(desired, size);
-            case MeasureSpec.UNSPECIFIED:
-            default:
-                return desired;
-        }
-    }
-
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int paddingLeft = getPaddingLeft();
-        int paddingTop = getPaddingTop();
+        int paddingTop  = getPaddingTop();
         int x = paddingLeft;
         int y = paddingTop;
 
