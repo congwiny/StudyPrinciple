@@ -3,6 +3,7 @@ package com.congwiny.principle.view.linearlayout;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.View;
 
@@ -10,7 +11,7 @@ import com.congwiny.principle.R;
 
 public class SimpleLinearLayout extends ViewGroup {
     public static final int HORIZONTAL = 0;
-    public static final int VERTICAL   = 1;
+    public static final int VERTICAL = 1;
 
     private int mOrientation = HORIZONTAL;
 
@@ -44,9 +45,9 @@ public class SimpleLinearLayout extends ViewGroup {
     }
 
     private void measureVertical(int widthMeasureSpec, int heightMeasureSpec) {
-        int paddingLeft   = getPaddingLeft();
-        int paddingRight  = getPaddingRight();
-        int paddingTop    = getPaddingTop();
+        int paddingLeft = getPaddingLeft();
+        int paddingRight = getPaddingRight();
+        int paddingTop = getPaddingTop();
         int paddingBottom = getPaddingBottom();
         int count = getChildCount();
 
@@ -82,9 +83,9 @@ public class SimpleLinearLayout extends ViewGroup {
     }
 
     private void measureHorizontal(int widthMeasureSpec, int heightMeasureSpec) {
-        int paddingLeft   = getPaddingLeft();
-        int paddingRight  = getPaddingRight();
-        int paddingTop    = getPaddingTop();
+        int paddingLeft = getPaddingLeft();
+        int paddingRight = getPaddingRight();
+        int paddingTop = getPaddingTop();
         int paddingBottom = getPaddingBottom();
         int count = getChildCount();
 
@@ -128,58 +129,134 @@ public class SimpleLinearLayout extends ViewGroup {
         }
     }
 
-    private void layoutVertical(int left, int top, int right, int bottom) {
-        int x = getPaddingLeft();
-        int y = getPaddingTop();
-        int count = getChildCount();
+    // 1. 自定义 LayoutParams
+    public static class LayoutParams extends MarginLayoutParams {
+        /**
+         * 子 View 的对齐方式，借用系统 Gravity 常量
+         */
+        public int gravity = Gravity.NO_GRAVITY;
 
-        for (int i = 0; i < count; i++) {
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+            TypedArray a = c.obtainStyledAttributes(attrs,
+                    R.styleable.SimpleLinearLayout_Layout);
+            gravity = a.getInt(R.styleable.SimpleLinearLayout_Layout_android_layout_gravity,
+                    Gravity.NO_GRAVITY);
+            a.recycle();
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(ViewGroup.LayoutParams source) {
+            super(source);
+        }
+    }
+
+    // 2. 覆盖生成 LayoutParams 的方法
+    @Override
+    public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParams(p);
+    }
+
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof LayoutParams;
+    }
+
+    // 3. 修改 onLayout，应用 gravity
+    private void layoutVertical(int left, int top, int right, int bottom) {
+        final int paddingLeft = getPaddingLeft();
+        final int paddingRight = getPaddingRight();
+        final int width = right - left;
+        int y = getPaddingTop();
+
+        for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             if (child.getVisibility() == GONE) continue;
 
-            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-            int cl = x + lp.leftMargin;
-            int ct = y + lp.topMargin;
-            int cr = cl + child.getMeasuredWidth();
-            int cb = ct + child.getMeasuredHeight();
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            int childW = child.getMeasuredWidth();
+            int childH = child.getMeasuredHeight();
 
+            // 计算水平位置
+            int childLeft;
+            int horizontalGravity = lp.gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
+            switch (horizontalGravity) {
+                case Gravity.CENTER_HORIZONTAL:
+                    childLeft = paddingLeft
+                            + lp.leftMargin
+                            + (width - paddingLeft - paddingRight
+                            - lp.leftMargin - lp.rightMargin - childW) / 2;
+                    break;
+                case Gravity.RIGHT:
+                    childLeft = width - paddingRight - lp.rightMargin - childW;
+                    break;
+                case Gravity.LEFT:
+                default:
+                    childLeft = paddingLeft + lp.leftMargin;
+            }
+
+            int cl = childLeft;
+            int ct = y + lp.topMargin;
+            int cr = cl + childW;
+            int cb = ct + childH;
             child.layout(cl, ct, cr, cb);
+
             y = cb + lp.bottomMargin;
         }
     }
 
     private void layoutHorizontal(int left, int top, int right, int bottom) {
+        final int paddingTop = getPaddingTop();
+        final int paddingBottom = getPaddingBottom();
+        final int height = bottom - top;
         int x = getPaddingLeft();
-        int y = getPaddingTop();
-        int count = getChildCount();
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             if (child.getVisibility() == GONE) continue;
 
-            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-            int cl = x + lp.leftMargin;
-            int ct = y + lp.topMargin;
-            int cr = cl + child.getMeasuredWidth();
-            int cb = ct + child.getMeasuredHeight();
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            int childW = child.getMeasuredWidth();
+            int childH = child.getMeasuredHeight();
 
+            // 计算垂直位置
+            int childTop;
+            int verticalGravity = lp.gravity & Gravity.VERTICAL_GRAVITY_MASK;
+            switch (verticalGravity) {
+                case Gravity.CENTER_VERTICAL:
+                    childTop = paddingTop
+                            + lp.topMargin
+                            + (height - paddingTop - paddingBottom
+                            - lp.topMargin - lp.bottomMargin - childH) / 2;
+                    break;
+                case Gravity.BOTTOM:
+                    childTop = height - paddingBottom - lp.bottomMargin - childH;
+                    break;
+                case Gravity.TOP:
+                default:
+                    childTop = paddingTop + lp.topMargin;
+            }
+
+            int cl = x + lp.leftMargin;
+            int ct = childTop;
+            int cr = cl + childW;
+            int cb = ct + childH;
             child.layout(cl, ct, cr, cb);
+
             x = cr + lp.rightMargin;
         }
-    }
-
-    @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new MarginLayoutParams(getContext(), attrs);
-    }
-
-    @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        return new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-    }
-
-    @Override
-    protected LayoutParams generateLayoutParams(LayoutParams p) {
-        return new MarginLayoutParams(p);
     }
 }

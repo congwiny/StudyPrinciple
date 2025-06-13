@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <com.congwiny.principle.view.linearlayout.SimpleLinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@color/green"
         app:orientation="vertical">
+
         <TextView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:background="@color/blue"
-            android:layout_marginStart="10dp"
             android:gravity="center"
-            android:text="1"
-            />
+            android:text="1" />
+
         <TextView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/yellow"
+            android:layout_gravity="left"
             android:layout_marginStart="20dp"
+            android:background="@color/yellow"
             android:gravity="center"
-            android:text="2"
-            />
+            android:text="2" />
+
         <TextView
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_gravity="right"
+            android:layout_marginEnd="20dp"
             android:background="@color/red"
-            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="3"
-            />
+            android:text="3" />
     </com.congwiny.principle.view.linearlayout.SimpleLinearLayout>
 </FrameLayout>

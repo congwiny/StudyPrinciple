@@ -6,4 +6,8 @@
             <enum name="vertical" value="1" />
         </attr>
     </declare-styleable>
+    <declare-styleable name="SimpleLinearLayout_Layout">
+        <!-- Use the standard android:layout_gravity attribute -->
+        <attr name="android:layout_gravity"/>
+    </declare-styleable>
 </resources>
