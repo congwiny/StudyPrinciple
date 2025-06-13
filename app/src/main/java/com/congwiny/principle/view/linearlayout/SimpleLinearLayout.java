@@ -130,7 +130,7 @@ public class SimpleLinearLayout extends ViewGroup {
 
     private void layoutVertical(int left, int top, int right, int bottom) {
         int x = getPaddingLeft();
-        int y = getPaddingLeft();
+        int y = getPaddingTop();
         int count = getChildCount();
 
         for (int i = 0; i < count; i++) {
