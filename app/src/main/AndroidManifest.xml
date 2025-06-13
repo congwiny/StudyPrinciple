@@ -32,11 +32,10 @@
             >
         </activity>
 
-        <activity android:name=".view.measurelayout.MeasureLayoutActivity">
-
+        <activity android:name=".view.listview.ListViewDemoActivity">
         </activity>
 
-        <activity android:name=".view.listview.ListViewDemoActivity"
+        <activity android:name=".view.scrollview.MyScrollViewActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,7 +45,8 @@
         </activity>
 
 
-<!--        <activity-->
+
+        <!--        <activity-->
 <!--            android:name=".jetpack.viewmodel.CustomActivity"-->
 <!--            android:exported="true">-->
 <!--            <intent-filter>-->
